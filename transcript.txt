@@ -1,0 +1,522 @@
+[Music]
+I was really excited when we were talking about doing this because my my
+favorite part of my job I love my job and my favorite part is helping people
+um learn how to use temporal uh solve their pain points uh avoid perilous
+pitfalls and I'm really alliterating now um and just have fun using temporal to
+to make being a developer easier um and so when we were talking about this what
+I wanted to do was um was talk about some of my favorite spooky movies and
+hopefully have a lot of fun explaining some some temporal best practices and
+their corresponding anti patterns um and really I had a lot of fun putting
+together these slides I laughed quite a bit hopefully you laugh too um but yeah I'm Joshua Smith I'm a solution
+architect here at temporal and you are I am Angie I run Community here at
+temporal and I've been here a little over a couple months so for some reason very new to temporal
+and so I'm GNA be you know sort of like following up with questions uh when Josh is doing his thing just to help folks on
+either end of the audience yeah awesome yeah and uh yeah add Q&A that's awesome
+okay so we're going to do a top 10 list um and I am um really excited hopefully
+you like spooky movies and maybe you'll pick up a a fun spooky movie to check
+out um after this talk but at least hopefully um these will be memorable
+things about ways to use temporal or avoid doing the Andy patterns number 10
+is wrapping sdks in scary ways this is really just a mummy rapping
+pun that's why I chose this picture uh not because Scooby-Doo has really anything to do with sdks um but one of
+the things that we observe at temporal is um as people are using our sdks we
+have sdks in in lots of different languages and developers including
+myself love to wrap libraries in other libraries and then wrap those libraries in other libraries and and a lot of
+times wrapping the temporal sdks can be good um there are a lot of really good examples some people at decide to um add
+a layer a thin shim layer to simplify security practices at a company
+or make connections to temporal Cloud easier or make cooking up to metrics
+easy and simple for developers and that's really great like um adding a little bit to the temporal sdks to make
+developer adoption easier is awesome um another pattern that I actually like is
+when people maybe build a layer on top of temporal for new developers to do
+simple workflows really easily uh there was a talk at our replay conference um from my good friends at Cash app who
+talk about how to do that um that is awesome but one of the things they did
+and we recommend is letting people also use the SDK directly or at minimum have
+that like thin shim layer um don't wrap it too deeply and the anti- pattern here is
+if you wrap the temporal SDK uh too far you sometimes people will
+hide important features or make it really difficult to upgrade the SDK as
+we add more features or change things and so what what I'm saying with uh this
+Annie pattern is don't wrap the SDK too deeply um where you get in a situation where it's hard to upgrade or
+maintenance is really hard or you break or hide features that are really helpful
+um we work really hard to make our SDK good we're open source if you have opinions and suggestions for how our
+sdks could improve we'd love to hear them um so my ask is don't wrap the sdks
+too deeply and work with us if you want improvements nice how how would I know
+if I have started to delve into the the realm of rapping too deeply yeah yeah you know there's a
+couple things that I would consider cautionary or or or points of
+concern If you experience them uh the first one is if you're spending a lot of
+time maintaining all of your libraries on top of temporal ideally if you do a
+wrapping of an SDK and you do it well you can take a new version and not
+really worry about it but if there's a lot of layers and you have to change a lot of code every every time we release
+a new feature or add new things to our sdks or even just take an SDK upgrade that is sort of a a concern that
+maybe you wrapped it too deeply um another one is if if developers are saying Hey I want to access this
+temporal feature I want to use temporal this way and that's just completely blocked by how you've wrapped your SDK I
+would say probably there's too much wrapping going on and your mummy's getting scary and that's a little bit of
+a concern and maybe we should go to Just exposing the SDK directly for those
+developers or consider thinning up your rapper does that make sense yeah awesome
+thank you okay number nine jump scares uh not done
+yet so one of my absolutely favorite movies uh or series of movies is the Scream movies this is from I think
+scream two uh I my wife would know better she's a more of a scream fan than
+I am I haven't memorized them all yet um but if you watch the Scream movies you might know that there's always a killer
+sometimes too and they're never quite done if if they defeat the killer they
+jump back up again at the last minute and jump scare everybody in the audience one more time and I was thinking about
+this because um occasionally people use temporal and they think things um are
+all done when they're not done yet and this is really important when it comes to things like item potency and local
+activities so just explaining what those are um when you're writing a function or
+a method in um any programming language um item potency means when you execute
+it multiple times it always has the same result you can execute it multiple times safely and local activities are
+variation of activities in temporal and what local activities do is run as part
+of the workflow cont text and um they don't write their completion to workflow
+history until uh they all complete or something else completes so what can
+happen if you kind of put these together is you can write a workflow you can use some local activities and if you don't
+have those activities be item potent if something crashes the local activities will continue to run and that can cause
+surprise consequences in one case um I was helping somebody out and they used a
+series of local activities to move money around and they had item potency Keys which are a thing you can use to
+guarantee your processes are item potent but they missed a change in the item
+potency API so their item potency Keys didn't work anymore and what ended up happening is they had a bug it one of
+their apis they were calling was down so the local activities kept trying to move the money the item pocy Keys didn't stop
+the move money from moving multiple times and a bunch of money got moved
+that wasn't supposed to because they thought um their item potency keys were working and they thought local
+activities always wrote workflow history so um just
+FYI in general I recommend using regular activities and not using local
+activities but if you do use them know how they work and always use item potency um when you're writing temporal
+activities there's a Blog about item potency if you want to check it out um and be careful here and um don't let
+your uh your workflow processing jump out and not be done yet when you think it's
+done way to bring that back that's very nice uh for for the folks who are a little newer to temporal uh here's a
+link by the way to that blog post I think um for the folks who are ner to temporal what what would be you said you
+don't generally recommend local activi but they do have uses what would be one example of why it would be a better idea
+to use a local activity versus a regular one awesome um so in temporal just for
+really new people workflows are where you define your process and activities are the risky steps and we have regular
+activities and those do write history records they're very simple to use that's plan a local
+activities don't write history records until they're off completed and they run
+in the workflow context and what's really nice about local activities is if you need very very low latency they
+don't have to get outside of the workflow context to go to the activity context they run in the workflow context
+um so they run in the worker process for the workflow there are less less Network
+jumps and they're more efficient and lower latency that's a good example for why You' want to use local activities
+but beware they work a little different than regular activ acties so it's a little bit of these are good in this use
+case but know what you're doing and know some of the downsides right on thank you so much
+awesome and yeah if anybody has any questions feel free to drop them in the Q&A would love
+that this is another one of my favorite movies it's called totally killer and it
+has a lot of callbacks to the 80s I was born in the 80s I love the 80s um and
+the context for this movie is this is our our heroine of the movie um she
+lives in current time and 30 years ago 35 years ago um uh there was a serial
+killer in her hometown who almost killed her mom and there was these murders from a long time ago um
+and in current time the killer shows up again and kills her mom it's really like
+oh no big time horror movie but her friend dude no I'm just kidding anyway
+her friend invents a time machine so the movie can happen and they she goes back
+in time to try and stop the killings so she can save her mom in the current timeline I'm not going to spoil it this
+is an amazing movie especially for your child of the 80s like me um and I highly
+recommend it and one of the reasons I was really excited about this example is
+because temporal also gives you time travel superpowers let's say you're working on your workflows and there's a
+bug in say one of your activities and you have 100,000 workflows and they all
+hit the same bug and um maybe that bug did some math and the math calculation
+is wrong and all of your customers now have the wrong amount of whatever it was maybe they your business service is a
+way to order widgets and now everybody has 10,000 extra widgets and that's really sad
+so temporal has time time travel and the way that works is every workflow because
+we talked about um workflow history and how that's really important every step
+in a workflow is recorded in temporal workflow history and you can rewind that using uh a feature called temporal reset
+as in as side um if a worker pod in temporal crashes that workflow history
+is also replayed that's where our conference name comes from and that's the workflow history concept is super
+important and I love talking about it to explain how temporal Works in this example let's say you wanted to fix that
+what you could do is deploy a fix for your math activity um the number of
+widgets people ordered to production and then you can reset your workflows in
+batch back to an earlier step and then what happens is temporal basically time
+machine rewinds all of your workflows back before that activity was called and then re-executes them through that same
+fixed code path and now the math is correct and we've I've worked with several people who have done this in
+production on their workflows and it's basically magic like you you have a bug
+in production you can rewind and replay with the bug fixed and it fixes all of their workflows it's really awesome um
+so definitely check out temporal workflow reset and how the replay functionality works of temporal
+workflows and use temporal to use time travel to save your mom or your
+workflows in this case that is so cool wow
+okay all right so number seven an overwhelming amount of tribles I am a
+big Star Trek fan uh it's not a horror show but there is an episode called The Trouble with tribles where there are
+just so many of these little fuzzy aliens and they sort of take over uh the
+St ship Enterprise um and the analogy for this one is temporal workflow
+history size like I said temporal workflow history is amazing it lets you go back
+in time it lets you keep track of every workflow that you've ever done um and it's very very performant but temporal
+while it is kind of magic is not actual magic and one of the things you can't do is have unlimited workflow history size
+and part of this reason is we want workflow replay and reset to be high perform it so there are limits they're
+pretty high but there are limits and one thing people can run into when they're first using temporal is assuming that
+workflows can have unlimited size because temporal is kind of magic and this is one area where you just need to
+watch out for those history limits um and manage the number of Tribbles I
+guess uh I don't know I just really like this episode um and the way you can do
+this is by maybe not keeping too much data in your temporal workflows if you
+need to work with large data you can access it externally to the workflow history um and you can also do things
+like uh look for if continue as new as uh recommended and then continue as new
+as needed that resets your workflow history um but really the pattern here
+is be aware that workflow history size has a limit and keep that in mind when you're designing your
+workflows awesome um we have a question on the previous uh note uh from Peter uh
+who has asked regarding batch operations I see only signal cancel terminate operations in the CLI how do I use
+rewind oh man and there's another question too
+um I off the top of my head do not remember the Syntax for batch reset but
+it there is a way to reset batch operations and we can get back to you on that one
+um do you want me to keep going through questions there's no I think there're starting to be a bunch of questions so
+we'll maybe hold some of those to the end but one on this slide particular is uh from Bruce zinc who asks what is the
+Practical workflow history size limit oh so there's there's a rule that
+someone has don't try to do math or remember complex numbers when you're giving a presentation if it's not on the
+slides um don't hold me to this Bruce I think it the workflow history size is uh
+10,000 events and 50 megabytes um thanks Drew um but it's in the docs
+and since Drew is putting out uh answers to questions he probably could look it
+up and share it but I think it's 50 megabytes and 10,000 items and there is
+a flag you can check for called continuous new recommended that lets you know when you're getting
+about halfway through or 40% of the way through to that limit great
+question all right I'm Gonna Keep Going Angie yep go for it okay number six
+crossing the streams so I also have a deep love for the Ghostbuster movies
+and it's one of those movies that has a set of rules that are unique to that universe or part of that universe and it
+makes me so happy um in Zombie Land there's the rule the rule
+set like cardio and double tap if you watch an Arnold sports neeger movie you know he's going to be back and in
+Ghostbuster movies don't cross the streams of the proton packs and in temporal we have a rule as well which is
+because workflows can be rewound replayed reset um they must be deterministic
+because what we want is when you're doing that Back In Time time travel and
+then fast forwarding again we want that to be deterministic so you don't get any weird uh random things that happen in
+the middle of your timeline and what you don't want is to cross one
+time stream with another time Stream So determinism is really important and with
+temporal if you need to make a change to workflow code for a workflow that's already running somewhere you can do
+that and as long as you don't break anything deterministically that's fine you can change activities for example
+but if you do need to change something we have a facility called workflow versioning and workflow patching various
+ways that you can make changes to your workflow time stream without breaking
+existing workflows in their replay and reset so the takeaway here is don't
+cross your proton proton pack streams or your workflow definition streams test for determinism and use uh versioning to
+make sure you don't have any versioning errors when you go to production this actually might be a good
+time to jump in with neur Roan's question which is um just curious about the previous example of redeploying a
+bug fix and rerunning does this not break the concept of determinism which is the topic that you just covered um he
+thought that this was something that we should avoid yeah great question Ran So
+the the easiest example that you can fix with replay is a change to an activity
+so temporal workflow code must be deterministic temporal activity code
+doesn't have to be deterministic and you can change that um and fix a bug and not worry about determinism
+problems but um if you need to change workflow code to fix a bug for future workflows
+that haven't run yet you can make those changes no worries um and you won't
+break determinism if the workflows aren't running but if the workflows are running you do have to do patching and
+versioning um and if you reset back before the um the change then you won't
+you'll have uh the new code path so that's that's really important um with
+that model is you can fix a bug and then replay going forward so hopefully that makes sense if it doesn't um happy to
+talk further about how temporal versioning and um replay Works um but
+the the easiest way to manage um that that kind of change is keep in mind you
+can um you can change activities and not have diversion because activities don't have to be
+deterministic awesome okay and thanks for the question yeah great question thank you um number five leaving handy
+tools sitting there so sometimes I watch a movie and the
+heroes of the movie run right by something that would be super helpful maybe it's a fire extinguisher maybe
+it's a first aid kit maybe it's a crowbar um maybe it's a flashlight and I
+I'm like no why why don't you pick up the thing that would be super helpful to you and um and I just want to jump into
+the movie and hand them the thing and I have the same feeling sometimes when I'm helping people out with temporal and
+they're doing something like oh yeah we have this thing this thing that will be super helpful for building this system
+um and examples like that are for that include things like sign signals or updates or queries or how to pull um
+there's quite a few temporal features that are in our documentation they're in our training there's a really wonderful
+course about interactive workflows that I just love that's pretty recent everybody should check that out and then
+um we also have a ton of samples of how to use temporal and I recommend um you know
+being familiar with the samples and like asking about if there's a sample for the thing you're trying to do um so you
+don't miss a really helpful tool that will help you
+later and sometimes I also recommend in movies people loot the bodies they like
+defeat a bunch of guys and don't take their stuff like use the tools that are available there's lots of really good
+helpful stuff okay no
+questions number four is the Mega workflow I love this movie uh The Blob I
+also am a big Steve McQueen fan I think he's a super cool guy um
+and the way I want to connect this to temporal is sometimes people build
+workflows that try to do everything they try to Model 50 different processes and really automate everything
+thing that a whole team or a whole organization might try to do in one
+workflow and that can be really complex and hard to manage and it might eat your car or a train I guess um but there is a
+better way um one of the things we talk about quite a bit when working with people using temporal is modeling uh
+processes that are simple and straightforward um and if you know a process kicks off another process and
+maybe that kicks off another process process those sound like three workflows to me not one big workflow that does all
+of those things um and there's a new feature in temporal which we talked about at replay called Nexus which makes
+breaking out complex processes into simpler steps um and maybe management of
+processes between teams a lot easier so check out Nexus uh workflows should model one process and you can break
+subprocesses into separate workflows or use other design principles to make that maintenance simpler so kind of like the
+whole reason we do distributed systems development is not to have monolithic applications so don't repeat that with
+your workflows make them bite-sized and doing one thing yeah yes exactly got
+it number three spooky anti-pattern arguing with yourself I was going to do
+the Man with Two Brains for this but then I remembered I haven't seen the Man with Two Brains and I didn't know what
+it was really about it just fit my concept um but I loved this picture I
+the guy in the background is hilariously creepy and it made me laugh so for this
+one um it's really good if you're not fighting yourself another horror movie
+reference that comes to mind is Ash in the Evil Dead movies at one point his hand becomes possessed and starts
+beating him up and the relationship to temporal
+is sometimes people really love State machines and they want to have a state
+machine in their temporal workflow and there probably are cases where that's a
+good idea um some people really love that but I have noticed that sometimes
+the state machine can have a list of the next possible States and you know valid
+states to transition to and the workflow can have that to sometimes they can be in conflict and at a minimum it's
+duplicate maintenance um we have some really great uh webinars about State machines and workflows and when to use
+which one um and for this one I'll just recommend if you're going to use
+temporal to model your processes and model process State you probably don't
+need an extra State machine you can probably just use the code first development of temporal to make State
+Management really really easy um and I love to have those conversations and talk through that process so um don't
+have split brain use temporal to manage process
+State oh Angie is talking and I can't hear her ah rookie mistake uh I said
+great great tip uh we have a question on the previous uh uh uh point about
+breaking things up into smaller workflows so Dave ywood is asking can you expand more on the benefits of
+making workflows smaller and simpler it sounds good on the surface and I can already think of one example where my
+team is not doing this but I'd like to have some concrete reasons that I can present for breaking it up in smaller
+workflows what are the benefits
+so I think for Me Maybe I'm going to oversimplify it it's it's not super
+sciency it's just is it easy to keep the whole process in your head at one time um if
+you really want to read a lot about it you can read books like domain driven design and understand things like two
+Pizza teams and you know managing uh complete systems and systems theory and
+you know there's a lot of really smart people who have written a lot of smart books about application design but for
+me I'm not the smartest biggest brain person and I can only keep so much in my head and if a workflow gets so complex
+that I can't keep it all in my head I get nervous about operating it in production and making sure I understand
+how that process is going to work and I get nervous about maintaining it and so
+if the developers on your team Dave are feeling like you know this workflow is just super complex and I'm not
+sure like how to understand it all at once I can't keep it all in my head
+that's usually the biggest uh caution sign I have that maybe it needs to be split up and maybe certain parts of it
+could be pushed down into a sub workflow like a child workflow or a workflow you call separately um or maybe there needs
+to be some abstraction of Concepts away like this complex piece needs to be put into a function and not just be in the
+main workflow code there's a bunch of different ways to simplify workflows but the biggest thing that I worry about and
+is my is my recommendation to you Dave is does your brain hurt when you try to think about the whole workflow and if it
+does probably need to make yeah probably also a component of like how easy is it
+to debug if something goes wrong right if if it if it goes wrong and the workflow is called process the credit
+card or something like that then you know what failed if it's called do all the ORD stuff that's going to be much
+much uh trickier exactly
+okay yeah there some other questions but I'll either work them in or we'll get to them at the end so I want to okay doing
+great keep it going cool we're we're doing good all right um I love
+horror movies you figure that out and horror movies are so popular they make it into commercials sometimes and in
+this case I can't remember the company exactly but there are a group of
+teenagers and they're running around between a spooky cabin and the spooky woods and at one point they have the
+idea to hide behind the chainsaws and you and the audience and
+the the spooky bad guy wearing the scary mask looks at the camera at the audience
+and shakes their head and it's like these teenagers are just going to die and they're going to die way too early
+and that always made me laugh and every time I watch a movie and the characters just do something completely stupid that
+gets them killed I'm like don't hide behind the chainsaws um and that makes me laugh but on a serious note I have
+helped customers who kill their workflows too soon and one recommendation I have about that is um
+when you're developing and designing workflows and you're calling
+activities you can customize the activity retry policy so by default with
+temporal when you call an activity it'll retry forever and this is awesome because you can call a database or call
+an API or some other external thing and when you call them and it doesn't work
+you don't have to write any retry code you just call write the code to call the thing and temporal will Auto
+automatically retry activities until they work which is amazing um it really can simplify the work you're doing and
+sometimes people want to customize things and they customize the retry policies so they might say you know I
+only want this to retry three times or take only a few seconds or something like that there are some timeouts and
+retries you can set and some workflows really need that they have to finish really quickly or
+they have to respond super fast there are reasons to do that and there's a reason we allow that customization but
+by default if your workflow can run anywhere from the fastest time like two
+seconds or retry and take maybe 10 minutes and that's okay for your business
+process don't customize your retry policies because if you do and that thing doesn't work and it takes more
+than three tries and then doesn't respond that will fail your workflow and then your workflow will be failed in
+production and I've worked with a lot of people who are like like oh oh no all my workflows are failed in production and I
+asked them why and they said well I only wanted to retry this call three times and I said okay but can it try more than
+that wouldn't it be better that your workflows just eventually succeed and they're like oh yeah that would be great
+I just thought I had to customize that the moral of the story is let your
+temporal uh activities retry if that fits your business process use the default they'll
+automatically um succeed event if you let them and then they won't die too soon like the young people in this
+commercial Amazing by the way Bruce zinc has piped up and said that that is a Geico commercial apparently thank you
+Bruce yeah yes and and kudos to Geico it's a great
+commercial all right spooky anti pattern number one hiding in a room with one
+exit if you couldn't tell not only do I love horror movies I love all people in
+the horror movies and I want them not to die and so in this case I'm sure you've
+all seen a movie where someone's running away from the bad guy and they run into a room and they hide and then the bad
+guy walks through the one door and they're trapped and you're like oh no why have you done this you're going to
+die um and in the temporal case workflows can be like this too you can
+write a workflow where you think everything's going to work and if everything works my workflow is going to
+work but what if something doesn't work what do we do then and it's when people
+are first writing temporal workflows it's tempting to say oh well if this doesn't work I'm just going to fail the
+workflow and call it good and that'll be the end of that process but what's interesting about temporal is we make it
+really easy to elevate your thinking and think about what happens when things go
+wrong can we still set things to right this is all kind of up in the air so I'll give a concrete
+example let's say you're writing a business process that does booking and
+you want to book a rental car and an airplane and a hotel so you start your
+business process you book the car that works great you book the hotel that works great you go to book the flights
+and something goes wrong and the flight can't be booked if you don't give yourself a way
+out uh a way to succeed you might just stop there and be like like oh no you booked the car in the hotel but we're
+stuck and the process failed and you give the user an error and they have two
+uh reservations they can't use but there is a technique in programming called
+compensation sometimes people talk about it in the context of doing a saga pattern where if you do something and
+then you can't proceed you undo the first thing so in a reservation case you would fail on the airplane reservation
+and then you'd unreserve the hotel hotel and the car and you tell the user hey I couldn't succeed with all three of the
+things you asked me to do so I backed them all off this is really great in the context of a business process not a
+technical failure so activities like we talked about can handle technical failures really well maybe an API is
+down temporarily or a database is slow temporarily that's fine um use activities but if there's a
+business failure like you couldn't make a booking because the plane is full or
+let's say you're trying to move money and you take money out of account a and try to put it into account B but then
+account B doesn't exist or isn't valid well you want to put the money back into
+account a that's success from a business model and temporal lets you think at a higher level and think about how to
+manage these complex business scenarios so that if you ask someone a user or a
+business person hey if I can't do step two what should I do about step one and
+they give you an answer you can program that into your workflows so that they can always succeed and that's really an
+awesome way to make your workflows always survive and be successful because
+as much as I love horror movie Side characters who happen to die because they went into a wrong room I also love
+workflows and I want them also to live and be happy and successful so give yourself an out use compensation to have
+a backup plan in case your main plan fails and watch the Scream
+movies if you have one takeaway from today's session watch the screen movies that's the
+yeah all right so we have a little bit more time and I had some bonus
+spookiness I wanted to cover also I really loved this picture uh it made me laugh and um these are maybe not so much
+anti- patterns is just horror themed suggestions from someone who loves to
+help people use temporal so number 11 bonus spookiness
+wandering into a dark alley I guess it's still a Scream movie this is Scream 4
+this is a wonderful actress she's in a lot of really great movies but she went into a dark alley here and you can guess
+what happened Pro tip don't go into a dark alley temporal has lots of ways you can
+understand how your workflows are working we have metrics for your sdks and their performance how they're doing
+for the the temporal cloud service so you can understand how well that's working and what's going on there we
+have the temporal UI which lets you see all your workflows and we also have uh
+visibility where you can set for example uh search attributes and find out where your workflows are and search for them
+so don't go dark go into a dark alley use metrics inv visibility and especially don't go down
+a dark alley with only one exit we already covered this so yeah yeah definitely all right I also love vampire
+movies and I love the Twilight movies a lot it's they're just hilarious to me um
+and there's also a couple of other vampires that are my favorites
+so in this one you don't want vampires to suck up all of your blood or in this
+case um be aware that uh that temporal
+the service has sort of a fixed capacity so I work with a lot of people who self-host temporal and one of the things
+that can happen is there is a workload on their temporal server that
+uses more resources than they expect and it soaks up all the resources and they have performance problems and that's
+kind of sad and so my recommendation here is use rate limits to limit those
+and prevent Noisy Neighbor problems or vampir sucking your blood I guess um or
+you can move to temporal cloud and our SAS capacity um make sure that you don't
+suck up all your resources so and I just like vampire movies all right and my
+last bonus one is from the X Files this is Fox Moulder if you are a fan of the X Files you know
+that um that Moulder and Scully don't
+stick together like they're like one of the greatest TV Partnerships ever and they're always like wandering off and
+this is sad to me because Moulder is the one who believes in Aliens and spookiness and Scully is the one who's
+the scientist and only believes in things she can prove and they always split up in the last Act of every
+episode and Moulder sees the aliens and Scully doesn't see the aliens or one of them like gets beat up
+by the bad guys but the other one doesn't and it drives me nuts I think they should stay together and um in
+general in horror movies don't split the Party Don't Go it alone and this is just
+um my ask to all of you one of the great things that I can do at temporal is help people use temporal use best practices
+have a lot of success um and everybody at temporal loves helping out our customers so my ask is don't go alone
+don't split the party um join the community work with us um let's build some awesome applications together I
+think that is just wonderful and I think Angie put the slack link is that right
+that's the our community slack link right there so yeah if you click well click uh let me paste the link in here
+actually and you actually can click it but yeah this is uh how you get to our Community slack there's I don't know
+13,000 some odd folks in there including uh temporal lights such as Josh and
+myself as well as uh you know other users of temporal with a lot of different use cases it's a great place
+to uh hang out and uh meet other developers and you know find out about
+new stuff coming down the pipe and all kinds of things so uh encourage you to join it it's also how you find out about silly things like spooky stories that
+we're doing right now uh on the note of spooky stories
+Josh um I wanted to talk about uh a little bit about what we have coming up next in this uh sort of month of Mayhem
+uh so if you want to keep an eye on all of this and find the links to all this stuff um you can go to this link which
+is um temporal iblog spooky stories um but in particular we got a couple of
+more like of these live Q&A type events coming up so next week uh we have Daniel
+Abraham who's a founding engineer for Auto and also has run uh you know infrastructure teams at places like
+Google and data dog so really knows uh knows his stuff he's going to be talking about deployments and how those can
+spiral into complexity and how a temporal can help with that uh and then we have our CTO and co-founder Maxim
+who's going to be talking towards the end of the month about this spooky ghost of temporals past so kind of what were
+the problems in distributed systems Computing that led to the creation of temporal and why were features developed
+in this kind of thing and I wanted to thank Josh for this again suggestion on that because that's a great that's a great idea for a session and it gets to
+us to Spooky ghosts and you know it's it's all good all around fun and then finally providing that certain
+hurricanes temper themselves a little bit um we uh have Tio from our support
+team talking about terrifying Tales from the temporal trenches and he will walk you through how he thinks about
+troubleshooting an application when something goes wrong and the different steps to take and how to isolate stuff and which benchmarking metrics to use to
+kind of track things and things like that so so should be a good time uh and now we're going to transition to uh
+answering the rest of the Q&A thanks so much for your patience folks uh while we got through the the session the most
+important question obviously in here is from Peter who has question of the day does Josh like the blade
+movie uh yes I do um yeah I'll say yes
+not not my top end favorite because I tend to like the high
+jinkx and sort of comedy of some of the other movies and that one's very serious
+and blade is sort of a badass which I like just depends on the day I don't
+know I think a more important question is Angie what is do you like the blade movie and what are your
+favorites so I and I'll be honest like horror is not really my thing but it it seems to always be my partners thing so
+I'm like horror adjacent to different things and so like I saw like the movie uh there's 28 Days Later that
+scared the Jesus out of me and then there's like a mockery of that movie called like oh you might know but anyway
+it's like it's a comedy version of it and even that scares me so like that's
+oh um how much of a a horror buff I am anyway um well well thanks for doing the
+spooky stuff with me then I didn't know you hated them so no no no I I love the genre it's just I am like a wuss and I
+have to like you know grip somebody's hand very tightly when I'm involved in a in a horror sit situation I love it all
+right we'll bring it back to temporal again so giovan benetti has asked when a worker crashes in the middle of a local
+activity does it run again in the next workflow rerun yeah so this is a really important
+question getting back to what I was saying about local activities um the way local activities
+work is they run in the workflow context and they don't write a history record
+until the the sequence of local activities if you have a series of them completes um or something else runs to
+record history so what to answer your question if a
+worker crashes in the middle of a local activity yes the local activity will run
+again um in the next workflow rerun for that workflow instance so you've got a
+workflow the worker running it crashes um and then as soon as another
+worker picks up that workflow or the original workflow restarts and pick up that workflow that local activity will
+run again um but just so you know regular activities work that same way as
+well if you're executing an activity and it hasn't completed yet and the worker
+crashes when the next worker picks up that workflow it'll rerun that activity from the beginning there are a few
+exceptions to that related to heartbeats but um but yes yes for both local and
+regular activity it'll rerun it's a good question yeah
+that's a great question um David Cohen has asked for tracking per uh sorry for
+for tracking process State wow my mouth quit working uh for tracking process
+State through the workflow do you have any suggestions for keeping history long term we only keep our workflow history
+for so long so we'd be losing the final state after some time yeah so this is a really wonderful
+question and I love it when people ask because it leads me to two different
+branching paths um and I'll talk about both so the simplest case
+is you can use a feature in temporal Cloud called workflow export where when
+workflows are completed you export them and you can use this for things like
+analytics or maybe you need to keep workflow history for a regulatory reason
+there are lots of reasons you just want to keep them archived just in case to know what
+happened um there's also a workflow archive feature for the open source self-hosted temporal um so either way
+you whether you're using the the temporal Cloud open source or the self-hosted open source you can use um
+workflow history export but it always makes me ask the question what do you need these workflow
+histories for long term a lot of times what I've noticed noticed is people
+model their process and they like let's say it's um ordering pizza so you start
+the workflow when the order comes in you close it when the order the pizza is delivered or handed off and the the
+billing is charged but there is some sort of business process step um maybe
+up to 120 days in the future you want to be able to um update that order
+because they want to add a retroactive discount or something like people want
+to keep that workflow around so they need so they can work with it so they
+can um update it reopen it uh and that
+is always a sign to me that the business process actually doesn't end until
+really 120 days after the order is closed um so one of the things I would
+just suggest to you David is if you need to interact with that workflow for whatever your usage is um in a long time
+in the future I'd like to understand or suggest you think about what that is and
+if it's part of maybe a bigger workflow a bigger business process or a process that just really doesn't end until
+something in the future um like there's no ability to retroactively add a
+discount to your pizza order or whatever that is and if that's the case I
+would I would have your workflow just have a long sleep at the end for whatever that is and maybe listen for
+signals or updates for whatever last step is that you want to have your workflow history for um my brain's a
+little tired so maybe I didn't make that much sense um but consider that maybe
+the business process doesn't actually end when you're ending your workflows now that it actually continues on into the
+future awesome and then the way to the way to handle that is kind of take the max value of
+how long it could possibly lay put asleep for that amount and then in the meantime listen for a unique signal
+that's like okay it actually finished whatever it was meant to do it um yeah the killer escaped and came back or
+whatever you know we we're monitoring for and then yeah yeah or or whatever might happen like in the pizza example
+if you can add a retroactive discount have a signal that can listen for that discount and then reapply the discount
+and the billing you know there's there's ways to work with whatever that last the real last step is maybe we're getting
+back into the horror movie where it's not quite dead yet but um what have a h
+build whatever that real last step is into the workflow instead of ending it early and then you don't need to worry
+about the workflow ending before you need to take action amazing all right I will keep the Line
+open for a couple more seconds see if there's any other questions but I just want to say thank you uh to everyone who attended thank you Josh for the awesome
+information this has been great uh I really appreciate all the questions folks asked too they were really great
+questions that I think a lot of other people would have as well um so there was a question at the very beginning which was is there going to be slides
+and stuff available and yes the answer is yes so we're going to take this uh put the recording out there's also going
+to be an accompanying kind of like written e blog posty kind of thing um so that uh there's like a you know sort of
+a a reference guide as well as this talk recorded and then um and then Josh are you cool making the slides available as
+well cu the slides are honestly the best part of your whole talk like you know fun facts and stuff but honestly yeah
+for sure we can um share the slides wherever that's no problem okay well there's no more
+questions so we'll give everyone seven minutes back thank you so much for we got one more question that was
+just under the wire nicely done keeping the suspense up I like it all right so Danilo asks are there some common steps
+to spot determin m in the workflow so if I understand your
+question correctly if you're looking for ways that there is non-determinism in the workflow um some of this is oh man
+there's more questions coming in um this is great thank you
+um if you're talking about changing workflows you can do determinism
+testing um in the temporal like let's say it's in the Java SDK there is a
+facility in the the Java test uh suite for temporal to replay a workflow and
+detect if there's any determinism breaking changes as part of a test um
+and that's documented in our training and in our docs um but if it's like hey
+I'm just writing code for the first time and I want to know if it's deterministic some of our sdks I don't
+remember off the top of her head which ones have determinism Checkers um python for example has a Sandbox that helps
+guarantee determinism and there are features in certain
+sdks that we basically remodel in R SDK or in certain languages that we remodel
+in R SDK to be deterministic an example is like go has um selectors and there's
+a workflow specific version of selectors that is deterministic in go so it kind
+of depends on your language and um and your SDK but those are some tips about how to spot
+determinism and if you do get if you do right workflow code and it's non-deterministic you'll just get a
+non-determinism error so one brute for brute force method is just write your
+workflow and it'll be non-deterministic and you'll get an error but yeah there's testing different facilities
+awesome uh What uh Peter asked what is the best source to learn NTI workflows aka the actor pattern
+well I think we have done some like Community or webinars about
+them on the temporal side um there's actually some really good writing in the industry about the actor pattern doing
+it particularly with temporal um yeah I would I would recommend uh looking at
+some of our um blogs and um webinars and
+if you have just want to know more um happy to like you know the community can
+uh help support talking about that discussing Your Design things like that um but I would start with what's out
+there already um like the resources we published already yeah thanks I see you posted the
+blog so thanks yeah I'm trying to keep I'm trying to follow the the bloody Trail and leave some LNS for folks to
+okay uh G Giovanni uh asked if we still have time for a last question do you
+have suggestions for workflow versioning maybe name workflows such as V1 V2 and so on yeah giovan great
+question real quickly there is a course in temporals training that's
+free that covers versioning as a topic and at a very high level there are you
+can version workflows with B1 B2 just like that you can also pass workflows um I like that a lot and we're
+working on a way to do worker versioning which has been in pre-release for a while but we're going to relaunch that
+um I think in a better way but first place to go I would go to the training
+it's wonderful our training team's done a great job and that course is free so check it out
+amazing uh how to identify temporal servers running out of resources what metrics would you need to check to to
+find that out yeah so at a very high level you can look at like workflow success latency if
+that's really really high I mean even if you just look in the temporal UI and you're like man this workflow took a long time to get going um then you can
+say oh man I don't know why my temporal uh temporal workflows are taking so long maybe my server out of resources I've
+had I worked with people and their workflows would take hours to start that's a good sign they're having some
+vampires sucking up all their resources um but yeah I would check workflow
+success latency schedule to start um you
+know the both for workflow um schedule to start and activity schedule to start
+um and you can always just look look at your temporal self-hosted server and see if it's running low on CPU in memory um
+just as a first Quick Pass awesome and I also know that uh Tio's talk on the on the 31st is going
+to cover a lot of these Benchmark metrics to to track in to catch these kind of problems early and often so
+perfect Point yep awesome all right we're going to wrap it there thank you again so much everyone thank you Josh
+for your time uh and uh yeah we'll see you at the next one thanks so much everyone bye bye

@@ -1,0 +1,1 @@
+node youtube-extract.mjs input.json transcript.txt
